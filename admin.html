@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Gallery</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body, html {
+        min-height: 100%; width: 100%;
+        font-family: 'Courier New', Courier, monospace;
+        color: #111111;
+        background: #f6f5f0;
+    }
+
+    .wrap {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 2.5rem 1.5rem 3rem 1.5rem;
+    }
+
+    .panel {
+        background: rgba(246, 245, 240, 0.96);
+        border-radius: 4px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+        border: 1px solid rgba(0, 0, 0, 0.15);
+        padding: 1.5rem;
+    }
+
+    h1 {
+        font-size: 1.1rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: #a82710;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    label {
+        display: block;
+        font-size: 0.7rem;
+        font-weight: bold;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 0.3rem;
+        margin-top: 1rem;
+    }
+    label:first-of-type { margin-top: 0; }
+
+    input[type="text"], input[type="password"], input[type="number"], select, textarea {
+        width: 100%;
+        padding: 10px 12px;
+        font-family: inherit;
+        font-size: 0.85rem;
+        border: 1px solid #333;
+        background-color: #ffffff;
+        outline: none;
+    }
+    input:focus, select:focus, textarea:focus { border-color: #a82710; }
+    textarea { resize: vertical; min-height: 70px; }
+
+    input[type="file"] {
+        width: 100%;
+        font-family: inherit;
+        font-size: 0.8rem;
+        margin-top: 0.2rem;
+    }
+
+    button {
+        margin-top: 1.4rem;
+        width: 100%;
+        padding: 11px 16px;
+        font-family: inherit;
+        font-size: 0.85rem;
+        font-weight: bold;
+        color: #ffffff;
+        background-color: #a82710;
+        border: 1px solid #a82710;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: background-color 0.2s, color 0.2s;
+    }
+    button:hover:not(:disabled) { background-color: transparent; color: #a82710; }
+    button:disabled { opacity: 0.5; cursor: default; }
+
+    .status {
+        margin-top: 0.8rem;
+        font-size: 0.75rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        min-height: 1rem;
+    }
+
+    .preview {
+        margin-top: 0.7rem;
+        max-width: 180px;
+        border: 1px dashed #111;
+        display: none;
+    }
+    .preview img { display: block; width: 100%; }
+
+    #admin-panel { display: none; }
+
+    .work-list { margin-top: 2.5rem; }
+    .work-list h2 {
+        font-size: 0.8rem; letter-spacing: 1.5px; text-transform: uppercase;
+        color: #a82710; margin-bottom: 0.8rem;
+    }
+    .work-row {
+        display: flex; align-items: center; gap: 0.8rem;
+        padding: 0.6rem 0;
+        border-bottom: 1px dashed rgba(0,0,0,0.2);
+    }
+    .work-row img { width: 46px; height: 56px; object-fit: cover; border: 1px solid #111; }
+    .work-row .wr-info { flex: 1; }
+    .work-row .wr-title { font-weight: bold; font-size: 0.82rem; }
+    .work-row .wr-meta { font-size: 0.68rem; color: #a82710; text-transform: uppercase; letter-spacing: 0.5px; }
+    .work-row .wr-delete {
+        margin-top: 0; width: auto; padding: 6px 10px; font-size: 0.68rem;
+        background: transparent; color: #a82710; border: 1px solid #a82710;
+    }
+    .work-row .wr-delete:hover { background: #a82710; color: #fff; }
+
+    a.back { display: inline-block; margin-bottom: 1.2rem; font-size: 0.75rem; color: #111; text-decoration: none; }
+    a.back:hover { color: #a82710; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+    <a class="back" href="/gallery.html">&larr; View gallery</a>
+
+    <div class="panel" id="login-panel">
+        <h1>Admin Login</h1>
+        <label for="password">Password</label>
+        <input type="password" id="password" autocomplete="current-password">
+        <button id="login-btn">Log in</button>
+        <div class="status" id="login-status"></div>
+    </div>
+
+    <div class="panel" id="admin-panel">
+        <h1>Add a Work</h1>
+        <form id="upload-form">
+            <label for="title">Title</label>
+            <input type="text" id="title" required>
+
+            <label for="medium">Medium</label>
+            <select id="medium" required>
+                <option value="painting">Painting</option>
+                <option value="sculpture">Sculpture</option>
+                <option value="photo">Photography</option>
+                <option value="film">Film</option>
+            </select>
+
+            <label for="year">Year</label>
+            <input type="number" id="year" min="1900" max="2100" value="2026">
+
+            <label for="blurb">Note (optional)</label>
+            <textarea id="blurb"></textarea>
+
+            <label for="file">Image file</label>
+            <input type="file" id="file" accept="image/*" required>
+            <div class="preview" id="preview"><img id="preview-img" alt=""></div>
+
+            <button type="submit" id="upload-btn">Upload</button>
+            <div class="status" id="upload-status"></div>
+        </form>
+
+        <div class="work-list">
+            <h2>Existing works</h2>
+            <div id="work-rows"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function(){
+    "use strict";
+
+    var MEDIUM_LABEL = { painting: 'Painting', sculpture: 'Sculpture', photo: 'Photography', film: 'Film' };
+    var loginPanel = document.getElementById('login-panel');
+    var adminPanel = document.getElementById('admin-panel');
+
+    // ---- login ----
+    document.getElementById('login-btn').addEventListener('click', function(){
+        var pw = document.getElementById('password').value;
+        var status = document.getElementById('login-status');
+        status.style.color = '#111';
+        status.textContent = 'Checking...';
+        fetch('/api/admin/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password: pw })
+        }).then(function(r){
+            if (r.ok) {
+                loginPanel.style.display = 'none';
+                adminPanel.style.display = 'block';
+                loadWorks();
+            } else {
+                status.style.color = '#a82710';
+                status.textContent = 'Incorrect password.';
+            }
+        }).catch(function(){
+            status.style.color = '#a82710';
+            status.textContent = 'Something went wrong.';
+        });
+    });
+
+    // ---- client-side downscale before upload, keeps the gallery fast on phones ----
+    function compressImage(file, maxDim, quality) {
+        return new Promise(function(resolve, reject){
+            var img = new Image();
+            var url = URL.createObjectURL(file);
+            img.onload = function(){
+                URL.revokeObjectURL(url);
+                var w = img.width, h = img.height;
+                if (w > maxDim || h > maxDim) {
+                    if (w >= h) { h = Math.round(h * (maxDim / w)); w = maxDim; }
+                    else { w = Math.round(w * (maxDim / h)); h = maxDim; }
+                }
+                var canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                canvas.toBlob(function(blob){
+                    if (!blob) { reject(new Error('Could not process image')); return; }
+                    resolve(blob);
+                }, 'image/jpeg', quality);
+            };
+            img.onerror = function(){ URL.revokeObjectURL(url); reject(new Error('Could not read image')); };
+            img.src = url;
+        });
+    }
+
+    var fileInput = document.getElementById('file');
+    var preview = document.getElementById('preview');
+    var previewImg = document.getElementById('preview-img');
+    fileInput.addEventListener('change', function(){
+        if (fileInput.files[0]) {
+            previewImg.src = URL.createObjectURL(fileInput.files[0]);
+            preview.style.display = 'block';
+        }
+    });
+
+    // ---- upload ----
+    document.getElementById('upload-form').addEventListener('submit', function(e){
+        e.preventDefault();
+        var btn = document.getElementById('upload-btn');
+        var status = document.getElementById('upload-status');
+        var file = fileInput.files[0];
+        if (!file) return;
+
+        btn.disabled = true;
+        status.style.color = '#111';
+        status.textContent = 'Compressing...';
+
+        compressImage(file, 2000, 0.85).then(function(blob){
+            status.textContent = 'Uploading...';
+            var fd = new FormData();
+            fd.append('title', document.getElementById('title').value);
+            fd.append('medium', document.getElementById('medium').value);
+            fd.append('year', document.getElementById('year').value);
+            fd.append('blurb', document.getElementById('blurb').value);
+            fd.append('file', blob, 'upload.jpg');
+
+            return fetch('/api/admin/upload', { method: 'POST', body: fd });
+        }).then(function(r){
+            if (!r.ok) throw new Error('Upload failed');
+            return r.json();
+        }).then(function(){
+            status.style.color = '#2e7d32';
+            status.textContent = 'Added.';
+            document.getElementById('upload-form').reset();
+            preview.style.display = 'none';
+            loadWorks();
+        }).catch(function(err){
+            status.style.color = '#a82710';
+            status.textContent = err.message || 'Something went wrong.';
+        }).finally(function(){
+            btn.disabled = false;
+        });
+    });
+
+    // ---- list + delete ----
+    function loadWorks() {
+        fetch('/api/works').then(function(r){ return r.json(); }).then(function(data){
+            var rows = document.getElementById('work-rows');
+            rows.innerHTML = '';
+            (data.works || []).forEach(function(w){
+                var row = document.createElement('div');
+                row.className = 'work-row';
+                row.innerHTML =
+                    '<img src="/art/' + encodeURIComponent(w.key) + '" alt="">' +
+                    '<div class="wr-info"><div class="wr-title"></div><div class="wr-meta"></div></div>' +
+                    '<button class="wr-delete">Delete</button>';
+                row.querySelector('.wr-title').textContent = w.title;
+                row.querySelector('.wr-meta').textContent = (MEDIUM_LABEL[w.medium] || w.medium) + (w.year ? ' \u2014 ' + w.year : '');
+                row.querySelector('.wr-delete').addEventListener('click', function(){
+                    if (!confirm('Delete "' + w.title + '"? This cannot be undone.')) return;
+                    fetch('/api/admin/delete', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: w.id })
+                    }).then(function(r){ if (r.ok) loadWorks(); });
+                });
+                rows.appendChild(row);
+            });
+        });
+    }
+})();
+</script>
+
+</body>
+</html>
