@@ -1,1 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gallery — Tinotenda Marcus Mutanga</title>
+<meta name="description" content="Painting, sculpture, photography and film by Tinotenda Marcus Mutanga (Mayor).">
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body, html {
+        min-height: 100%;
+        width: 100%;
+        font-family: 'Courier New', Courier, monospace;
+        color: #111111;
+        background: #f6f5f0;
+    }
+
+    .bg-layer {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('amm__c.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        opacity: 0.14;
+        z-index: 0;
+    }
+
+    .wrap {
+        position: relative;
+        z-index: 10;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        padding: 0 1.5rem 2rem 1.5rem;
+    }
+
+    .panel {
+        background: rgba(246, 245, 240, 0.92);
+        border-radius: 4px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+        border: 1px solid rgba(0, 0, 0, 0.15);
+    }
+
+    /* ---- top bar (matches index.html) ---- */
+    .top-bar {
+        width: calc(100% + 3rem);
+        margin-left: -1.5rem;
+        background: rgba(246, 245, 240, 0.96);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+        padding: 0.6rem 1.5rem;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        font-size: 0.75rem;
+        font-weight: bold;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        position: relative;
+        z-index: 20;
+    }
+    .top-bar-left { text-align: left; }
+    .top-bar-left a { color: #111111; text-decoration: none; border-bottom: 1px solid transparent; }
+    .top-bar-left a:hover { color: #a82710; border-bottom: 1px solid #a82710; }
+    .top-bar-center { text-align: center; font-size: 0.85rem; letter-spacing: 2px; color: #a82710; }
+    .top-bar-right { text-align: right; }
+    .top-bar-right a {
+        color: #111111; text-decoration: none; font-weight: bold;
+        font-size: 0.75rem; letter-spacing: 1.5px; text-transform: uppercase;
+        border-bottom: 1px solid transparent; transition: color 0.2s ease, border-bottom 0.2s ease;
+    }
+    .top-bar-right a:hover { color: #a82710; border-bottom: 1px solid #a82710; }
+
+    /* ---- heading ---- */
+    .heading {
+        margin: 2rem 0 1.5rem 0;
+        padding: 1.25rem 1.5rem;
+        text-align: center;
+    }
+    .heading h1 {
+        font-size: 1.3rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: #a82710;
+        margin-bottom: 0.4rem;
+    }
+    .heading p {
+        font-size: 0.85rem;
+        color: #444;
+    }
+
+    /* ---- medium tabs ---- */
+    .tabs {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        margin-bottom: 2rem;
+        padding: 0.9rem;
+    }
+    .tab {
+        font-family: inherit;
+        font-size: 0.72rem;
+        font-weight: bold;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        padding: 0.5rem 0.9rem;
+        background: transparent;
+        border: 1px dashed #111111;
+        color: #111111;
+        cursor: pointer;
+        transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+    }
+    .tab.active, .tab:hover {
+        background-color: #a82710;
+        border-color: #a82710;
+        color: #ffffff;
+    }
+
+    /* ---- grid ---- */
+    main { flex: 1; }
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 1.25rem;
+    }
+
+    .card {
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        cursor: pointer;
+    }
+    .card .thumb {
+        width: 100%;
+        aspect-ratio: 4 / 5;
+        background: #e5e2d8;
+        overflow: hidden;
+    }
+    .card .thumb img {
+        width: 100%; height: 100%; object-fit: cover;
+        display: block;
+        transition: transform 0.4s ease;
+    }
+    .card:hover .thumb img { transform: scale(1.04); }
+    .card .info { padding: 0.8rem 0.9rem; }
+    .card .info .title { font-weight: bold; font-size: 0.9rem; margin-bottom: 0.15rem; }
+    .card .info .meta {
+        font-size: 0.68rem; letter-spacing: 1px; text-transform: uppercase; color: #a82710;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1.5rem;
+        color: #555;
+        font-size: 0.85rem;
+    }
+
+    /* ---- lightbox ---- */
+    .lightbox {
+        position: fixed; inset: 0; z-index: 100;
+        background: rgba(17, 17, 17, 0.92);
+        display: none;
+        align-items: center; justify-content: center;
+        padding: 2rem;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox-inner {
+        max-width: 90vw; max-height: 88vh;
+        display: flex; flex-direction: column; align-items: center; gap: 0.9rem;
+    }
+    .lightbox img { max-width: 90vw; max-height: 74vh; object-fit: contain; border: 2px solid #f6f5f0; }
+    .lightbox-caption { color: #f6f5f0; text-align: center; font-size: 0.8rem; }
+    .lightbox-caption .title { font-weight: bold; margin-bottom: 0.2rem; }
+    .lightbox-caption .meta { color: #d98b7a; letter-spacing: 1px; text-transform: uppercase; font-size: 0.68rem; }
+    .lightbox-close {
+        position: absolute; top: 1.2rem; right: 1.6rem;
+        background: none; border: 1px solid #f6f5f0; color: #f6f5f0;
+        font-family: inherit; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;
+        padding: 0.4rem 0.8rem; cursor: pointer;
+    }
+    .lightbox-close:hover { background: #f6f5f0; color: #111; }
+
+    /* ---- footer ---- */
+    footer {
+        margin-top: 2rem;
+        padding: 1rem 1.5rem;
+        display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+        font-size: 0.72rem; color: #444; text-transform: uppercase;
+    }
+
+    @media (max-width: 768px) {
+        .top-bar { grid-template-columns: 1fr; gap: 0.3rem; text-align: center; }
+        .top-bar-left, .top-bar-center, .top-bar-right { text-align: center; }
+        footer { flex-direction: column; text-align: center; }
+    }
+</style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+
+<div class="wrap">
+    <div class="top-bar">
+        <div class="top-bar-left"><a href="/">&larr; Home</a></div>
+        <div class="top-bar-center">Gallery</div>
+        <div class="top-bar-right"><a href="https://marcusmayor.pixieset.com/thriftandthreads/" target="_blank" rel="noopener noreferrer">Portfolio</a></div>
+    </div>
+
+    <div class="heading panel">
+        <h1>A Mayor's Memoir &mdash; Works</h1>
+        <p>Painting, sculpture, photography and film.</p>
+    </div>
+
+    <div class="tabs panel" id="tabs">
+        <button class="tab active" data-medium="all">All</button>
+        <button class="tab" data-medium="painting">Painting</button>
+        <button class="tab" data-medium="sculpture">Sculpture</button>
+        <button class="tab" data-medium="photo">Photography</button>
+        <button class="tab" data-medium="film">Film</button>
+    </div>
+
+    <main>
+        <div class="grid" id="grid"></div>
+        <div class="empty-state" id="empty-state" style="display:none;">Nothing here yet &mdash; check back soon.</div>
+    </main>
+
+    <footer>
+        <div>&copy; <span id="year"></span> Tinotenda Marcus Mutanga</div>
+        <div><a href="/" style="color:#111;text-decoration:none;">marcusmayorr.workers.dev</a></div>
+    </footer>
+</div>
+
+<div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightbox-close">Close</button>
+    <div class="lightbox-inner">
+        <img id="lightbox-img" src="" alt="">
+        <div class="lightbox-caption">
+            <div class="title" id="lightbox-title"></div>
+            <div class="meta" id="lightbox-meta"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function(){
+    "use strict";
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    var MEDIUM_LABEL = { painting: 'Painting', sculpture: 'Sculpture', photo: 'Photography', film: 'Film' };
+    var allWorks = [];
+    var currentFilter = 'all';
+
+    var grid = document.getElementById('grid');
+    var emptyState = document.getElementById('empty-state');
+    var tabs = document.querySelectorAll('.tab');
+
+    function render() {
+        var works = currentFilter === 'all' ? allWorks : allWorks.filter(function(w){ return w.medium === currentFilter; });
+        grid.innerHTML = '';
+        if (works.length === 0) {
+            emptyState.style.display = 'block';
+            return;
+        }
+        emptyState.style.display = 'none';
+        works.forEach(function(w){
+            var card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML =
+                '<div class="thumb"><img src="/art/' + encodeURIComponent(w.key) + '" alt="' + escapeHtml(w.title) + '" loading="lazy"></div>' +
+                '<div class="info">' +
+                    '<div class="title">' + escapeHtml(w.title) + '</div>' +
+                    '<div class="meta">' + (MEDIUM_LABEL[w.medium] || w.medium) + (w.year ? ' &bull; ' + escapeHtml(String(w.year)) : '') + '</div>' +
+                '</div>';
+            card.addEventListener('click', function(){ openLightbox(w); });
+            grid.appendChild(card);
+        });
+    }
+
+    function escapeHtml(s) {
+        var d = document.createElement('div');
+        d.textContent = s;
+        return d.innerHTML;
+    }
+
+    tabs.forEach(function(tab){
+        tab.addEventListener('click', function(){
+            tabs.forEach(function(t){ t.classList.remove('active'); });
+            tab.classList.add('active');
+            currentFilter = tab.dataset.medium;
+            render();
+        });
+    });
+
+    // ---- lightbox ----
+    var lightbox = document.getElementById('lightbox');
+    var lbImg = document.getElementById('lightbox-img');
+    var lbTitle = document.getElementById('lightbox-title');
+    var lbMeta = document.getElementById('lightbox-meta');
+
+    function openLightbox(w) {
+        lbImg.src = '/art/' + encodeURIComponent(w.key);
+        lbImg.alt = w.title;
+        lbTitle.textContent = w.title;
+        lbMeta.textContent = (MEDIUM_LABEL[w.medium] || w.medium) + (w.year ? ' \u2014 ' + w.year : '');
+        lightbox.classList.add('open');
+    }
+    function closeLightbox() { lightbox.classList.remove('open'); lbImg.src = ''; }
+
+    document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', function(e){ if (e.target === lightbox) closeLightbox(); });
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeLightbox(); });
+
+    // ---- load works ----
+    fetch('/api/works')
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+            allWorks = data.works || [];
+            render();
+        })
+        .catch(function(){
+            emptyState.textContent = 'Could not load the gallery right now.';
+            emptyState.style.display = 'block';
+        });
+})();
+</script>
+
+</body>
+</html>
 
