@@ -110,6 +110,9 @@
 
         .top-bar-right {
             text-align: right;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1.2rem;
         }
 
         .top-bar-right a {
@@ -377,6 +380,9 @@
             .top-bar-left, .top-bar-center, .top-bar-right {
                 text-align: center;
             }
+            .top-bar-right {
+                justify-content: center;
+            }
             footer {
                 flex-direction: column-reverse;
                 align-items: center;
@@ -401,6 +407,7 @@
             <div class="top-bar-left" id="geo-time-display">FETCHING LOCATION & TIME...</div>
             <div class="top-bar-center">CityAsWorld</div>
             <div class="top-bar-right">
+                <a href="/gallery.html">Gallery</a>
                 <a href="https://marcusmayor.pixieset.com/thriftandthreads/" target="_blank" rel="noopener noreferrer">PORTFOLIO</a>
             </div>
         </div>
